@@ -71,12 +71,29 @@ Emoji Log Semantics:
 ## 📂 Repository Structure
 ```
 / (root)
-├── src/main/java/com/example/integrationservice/...    # Spring Boot backend
-├── src/test/java/...                                    # Tests
-├── integration-visualizer/                              # Next.js dashboard (remove nested .git)
-├── docker-compose.yml                                   # Optional Kafka stack
-├── scripts/                                             # PowerShell helper scripts
-├── BUILD.md / MIGRATION_GUIDE.md / ARCHITECTURE_COMPARISON.md
+├── src/main/java/com/example/integrationservice/
+│   ├── IntegrationServiceApplication.java               # Main entry + CORS config
+│   ├── controller/IntegrationController.java            # REST endpoints (@RestController)
+│   ├── service/IntegrationService.java                  # Flow orchestration
+│   ├── mapper/CustomerMapper.java                       # DataWeave → Java transformation
+│   ├── client/ExternalApiClient.java                    # WebClient for external APIs
+│   ├── producer/CustomerEventProducer.java              # Kafka publisher
+│   ├── config/                                          # Kafka, WebClient config
+│   ├── model/                                           # Customer, CustomerResponse DTOs
+│   └── exception/GlobalExceptionHandler.java            # Centralized error handling
+├── src/test/java/...                                    # Unit & integration tests
+├── integration-visualizer/                              # Next.js 16 dashboard
+│   ├── src/components/                                  # FlowCard, DataTable, LogConsole
+│   ├── src/lib/api.ts                                   # API client + mock data
+│   └── package.json
+├── scripts/
+│   ├── setup-git-repo.sh                                # Git repository initialization
+│   ├── install-java17-*.ps1                             # Java 17 setup
+│   └── test-api.ps1                                     # API testing script
+├── docker-compose.yml                                   # Optional Kafka + Zookeeper
+├── MIGRATION_ANALYSIS.md                                # Cost-benefit, mapping, AI prompts
+├── LEADERSHIP_PRESENTATION.md                           # Executive summary + ROI
+├── MIGRATION_GUIDE.md                                   # Step-by-step patterns
 └── README.md                                            # This file
 ```
 
