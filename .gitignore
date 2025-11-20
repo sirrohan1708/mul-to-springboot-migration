@@ -40,3 +40,9 @@ build/
 
 ### Logs ###
 *.log
+target/
+.node_modules/
+.integration-visualizer/node_modules/
+*.log
+.idea/
+.DS_Store

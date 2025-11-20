@@ -1,351 +1,262 @@
-# 🚀 MuleSoft to Spring Boot Migration Prototype
+# 🌐 MuleSoft ➜ Spring Boot Migration & Integration Visualizer
 
-A comprehensive Spring Boot 3.3+ microservice demonstrating how to replace MuleSoft integration flows with modern, cloud-native Spring Boot architecture.
+A leadership-ready monorepo showcasing how to modernize MuleSoft-style integration flows using pure open-source Spring Boot + Next.js.
 
-## 📋 Table of Contents
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [MuleSoft to Spring Boot Mapping](#mulesoft-to-spring-boot-mapping)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Project Structure](#project-structure)
-- [API Endpoints](#api-endpoints)
-- [Testing](#testing)
-- [Docker Deployment](#docker-deployment)
+---
+## 🧭 Executive Summary
+This prototype demonstrates a phased, low-risk migration from MuleSoft proprietary orchestration to a cloud‑native, Java 17 / Spring Boot 3.3.x stack with a companion Next.js dashboard for transparent flow visualization.
 
-## 🎯 Overview
+Key Outcomes:
+- Eliminates license dependency for core integration patterns (HTTP, transformation, messaging, logging)
+- Improves observability (structured emoji logs + Actuator + visual dashboard)
+- Aligns with enterprise Java skill sets (Spring ecosystem)
+- Ready for expansion to resilience, security, and platform ops (Resilience4j, OpenTelemetry, OAuth2)
 
-This project demonstrates a complete migration from MuleSoft integration patterns to Spring Boot, implementing:
-
-- ✅ REST API exposure (MuleSoft HTTP Listener)
-- ✅ External API integration (MuleSoft HTTP Connector)
-- ✅ Data transformation (MuleSoft DataWeave)
-- ✅ Kafka messaging (MuleSoft VM/JMS)
-- ✅ Error handling & retry (MuleSoft Error Handlers)
-- ✅ Logging & observability (MuleSoft Logger)
-- ✅ Health checks (MuleSoft Monitoring)
-
-## 🏗️ Architecture
-
+---
+## 🏗️ High-Level Architecture
 ```
-┌─────────────┐
-│   Client    │
-└──────┬──────┘
-       │ HTTP GET /api/customer/{id}
-       ▼
-┌─────────────────────────────────┐
-│  IntegrationController          │  ← MuleSoft HTTP Listener
-│  @GetMapping("/api/customer")   │
-└────────┬────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────┐
-│  IntegrationService             │  ← MuleSoft Flow
-│  - processCustomer()            │
-│  - transformCustomerData()      │  ← MuleSoft DataWeave
-└────────┬────────────────────────┘
-         │
-         ├──────────────┬─────────────┐
-         ▼              ▼             ▼
-┌─────────────┐  ┌──────────────┐  ┌─────────────────┐
-│ External    │  │ Transform    │  │ Kafka           │
-│ API Client  │  │ Logic        │  │ Producer        │
-│ (WebClient) │  │ (Java)       │  │ (KafkaTemplate) │
-└─────────────┘  └──────────────┘  └─────────────────┘
-      │                                     │
-      │                                     ▼
-      ▼                            ┌─────────────────┐
-┌─────────────┐                   │ Kafka Broker    │
-│ External    │                   │ Topic:          │
-│ REST API    │                   │ customer-events │
-└─────────────┘                   └─────────────────┘
++----------------------+           +---------------------------+
+|   Next.js Dashboard  |  HTTP     |  Spring Boot Integration  |
+| (integration-visualizer) ------->|  Service (Reactive/Web)   |
+|  Port 3000           |           |  Port 8080                |
++----------+-----------+           +-----------+---------------+
+           |                                       |
+           | (Optional Kafka events)               | KafkaTemplate (async publish)
+           |                                       v
+           |                               +---------------+
+           |                               |   Kafka       |
+           |                               | customer-*    |
+           |                               +---------------+
+           |                                              
+           | Fallback / Demo Mode (if backend down)        
+           v                                              
+   Mock Data / Simulated Logs                              
 ```
 
-## 🔄 MuleSoft to Spring Boot Mapping
+Mermaid (optional for GitHub rich view):
+```mermaid
+flowchart LR
+  A[Client / Dashboard] --> B[/GET /api/customer/{id}/]
+  B --> C{IntegrationService (Flow)}
+  C --> D[ExternalApiClient (WebClient)]
+  C --> E[transformCustomerData()]
+  C --> F[CustomerEventProducer (Kafka)]
+  F --> K[(Kafka Topic)]
+```
+---
+## 🔄 MuleSoft ➜ Spring Boot Mapping
+| MuleSoft | Spring Boot | Location |
+|----------|-------------|----------|
+| Flow | Service orchestration | `IntegrationService` |
+| HTTP Listener | `@RestController` | `IntegrationController` |
+| HTTP Connector | `WebClient` | `ExternalApiClient` |
+| DataWeave | Java transform method | `transformCustomerData()` |
+| VM/JMS Publish | Kafka producer | `CustomerEventProducer` |
+| Logger | SLF4J + emoji pattern | throughout code |
+| Error Handler | `@RestControllerAdvice` | `GlobalExceptionHandler` |
+| Retry Policy | `@Retryable` | methods in client/service |
+| Connector Config | `@Configuration` beans | `KafkaConfig`, `WebClientConfig` |
+| Monitoring | Actuator endpoints | `/actuator/*` |
 
-| MuleSoft Component | Spring Boot Equivalent | Implementation |
-|-------------------|------------------------|----------------|
-| **MuleSoft Flow** | `@Service` class | `IntegrationService.processCustomer()` |
-| **HTTP Listener** | `@RestController` | `IntegrationController` |
-| **HTTP Request Connector** | `WebClient` | `ExternalApiClient` |
-| **DataWeave Transformation** | Java methods | `transformCustomerData()` |
-| **VM Publish / JMS Send** | `KafkaTemplate` | `CustomerEventProducer` |
-| **Logger Component** | `Slf4j` logging | `log.info()` throughout |
-| **Error Handler** | `@RestControllerAdvice` | `GlobalExceptionHandler` |
-| **On-Error-Continue** | `@ExceptionHandler` | Exception handling methods |
-| **Retry Policy** | `@Retryable` | `@Retryable` on methods |
-| **Connector Config** | `@Configuration` | `KafkaConfig`, `WebClientConfig` |
-| **Variables** | Method variables | Local variables in methods |
-| **Monitoring** | Spring Actuator | `/actuator/health` endpoint |
+Emoji Log Semantics:
+- 🌊 Flow boundary start/end
+- 📍 Step markers
+- 🔌 Connector operations (external call)
+- 🔄 Transformation
+- 📤 Publish/send
+- ✅ Success
+- ❌ Error
 
-## 📦 Prerequisites
+---
+## 📂 Repository Structure
+```
+/ (root)
+├── src/main/java/com/example/integrationservice/...    # Spring Boot backend
+├── src/test/java/...                                    # Tests
+├── integration-visualizer/                              # Next.js dashboard (remove nested .git)
+├── docker-compose.yml                                   # Optional Kafka stack
+├── scripts/                                             # PowerShell helper scripts
+├── BUILD.md / MIGRATION_GUIDE.md / ARCHITECTURE_COMPARISON.md
+└── README.md                                            # This file
+```
 
-- **Java 17+**
-- **Maven 3.6+**
-- **Docker** (for Kafka)
-- **Docker Compose**
+Recommended Cleanup Before Publishing:
+1. Remove nested Git repo (embedded warning):
+   ```powershell
+   Remove-Item -Recurse -Force .\integration-visualizer\.git
+   git add .
+   git commit -m "Remove embedded .git from integration-visualizer"
+   ```
+2. Add root `.editorconfig`, `LICENSE`, `CONTRIBUTING.md` (optional).
+3. Unify versions: ensure Next.js README reflects actual version (currently 16+/App Router).
+4. Optionally move backend into `/backend/` and dashboard into `/dashboard/` for clarity (update paths in docs).
 
-## 🚀 Quick Start
+---
+## ✅ Prerequisites
+Backend:
+- Java 17
+- Maven 3.8+
+Frontend:
+- Node.js 18+
+Optional:
+- Docker Desktop (Kafka) – not required for demo
 
-### 1. Start Kafka using Docker Compose
+---
+## 🚀 Quick Start (No Kafka Required)
+```powershell
+# 1. Build backend
+mvn clean install
 
+# 2. Run backend
+mvn spring-boot:run
+# or
+java -jar target/integration-service-1.0.0.jar
+
+# 3. Start dashboard
+cd integration-visualizer
+npm install
+npm run dev
+```
+Access:
+- API: http://localhost:8080/api/customer/1
+- Health: http://localhost:8080/actuator/health
+- Dashboard: http://localhost:3000
+
+Full Stack with Kafka (optional):
 ```powershell
 docker-compose up -d kafka zookeeper kafka-ui
 ```
+Kafka UI: http://localhost:8090
 
-This starts:
-- Kafka broker on `localhost:9092`
-- Zookeeper on `localhost:2181`
-- Kafka UI on `http://localhost:8090`
+---
+## 🔐 CORS Configuration
+Defined in `IntegrationServiceApplication` via a `WebMvcConfigurer` bean allowing `http://localhost:3000`.
 
-### 2. Build the Application
-
+---
+## 🧪 Testing & Quality
 ```powershell
-mvn clean install
+# Unit tests
+mvn test
+
+# (Add Jacoco if coverage needed)
+# mvn clean test jacoco:report
 ```
+Add future pipeline (GitHub Actions) for CI: build → test → security scan (OWASP dep check) → optional Docker build.
 
-### 3. Run the Application
+---
+## 📡 API Endpoints
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/customer/{id}` | Process customer through flow |
+| GET | `/api/status` | Simple status payload |
+| GET | `/api/info` | Metadata + mapping |
+| GET | `/actuator/health` | Health status |
 
-```powershell
-mvn spring-boot:run
-```
-
-Or run with Java:
-
-```powershell
-java -jar target/integration-service-1.0.0.jar
-```
-
-The application will start on `http://localhost:8080`
-
-### 4. Test the API
-
-```powershell
-# Get customer by ID
-curl http://localhost:8080/api/customer/1
-
-# Check service status
-curl http://localhost:8080/api/status
-
-# Check health
-curl http://localhost:8080/actuator/health
-
-# Get API info
-curl http://localhost:8080/api/info
-```
-
-## 📁 Project Structure
-
-```
-src/
-├── main/
-│   ├── java/
-│   │   └── com/example/integrationservice/
-│   │       ├── IntegrationServiceApplication.java  # Main entry point
-│   │       ├── controller/
-│   │       │   └── IntegrationController.java      # REST endpoints (HTTP Listener)
-│   │       ├── service/
-│   │       │   └── IntegrationService.java         # Business logic (Flow)
-│   │       ├── client/
-│   │       │   └── ExternalApiClient.java          # API client (HTTP Connector)
-│   │       ├── producer/
-│   │       │   └── CustomerEventProducer.java      # Kafka producer (VM Publish)
-│   │       ├── config/
-│   │       │   ├── KafkaConfig.java                # Kafka configuration
-│   │       │   └── WebClientConfig.java            # WebClient configuration
-│   │       ├── model/
-│   │       │   ├── Customer.java                   # Input model
-│   │       │   └── CustomerResponse.java           # Output model
-│   │       └── exception/
-│   │           └── GlobalExceptionHandler.java     # Error handlers
-│   └── resources/
-│       └── application.yml                          # Application configuration
-└── test/
-    └── java/
-        └── com/example/integrationservice/
-            └── service/
-                └── IntegrationServiceTest.java      # Unit tests
-```
-
-## 🌐 API Endpoints
-
-### Get Customer by ID
-```http
-GET /api/customer/{id}
-```
-
-**Response:**
+Sample Response (simplified):
 ```json
 {
   "customerId": 1,
   "fullName": "Emily Johnson",
-  "email": "emily.johnson@example.com",
-  "phoneNumber": "+1-555-0100",
-  "customer_age": 28,
-  "location": "Phoenix, Arizona",
-  "companyName": "Dooley, Kozey and Cronin",
-  "jobTitle": "Sales Manager",
   "loyaltyScore": "Silver",
-  "processedAt": "2025-11-11T10:30:00",
+  "processedAt": "2025-11-20T10:30:00",
   "status": "SUCCESS"
 }
 ```
 
-### Service Status
-```http
-GET /api/status
-```
-
-### Health Check
-```http
-GET /actuator/health
-```
-
-### API Information
-```http
-GET /api/info
-```
-
-## 🧪 Testing
-
-### Run Unit Tests
-```powershell
-mvn test
-```
-
-### Run Integration Tests
-```powershell
-mvn verify
-```
-
-### Test Coverage
-```powershell
-mvn clean test jacoco:report
-```
-
-## 🐳 Docker Deployment
-
-### Option 1: Run Full Stack with Docker Compose
-
-```powershell
-docker-compose up --build
-```
-
-This starts:
-- Zookeeper
-- Kafka
-- Kafka UI
-- Integration Service
-
-### Option 2: Build and Run Manually
-
-```powershell
-# Build Docker image
-docker build -t integration-service:latest .
-
-# Run container
-docker run -p 8080:8080 `
-  -e SPRING_KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:9092 `
-  integration-service:latest
-```
-
-## 📊 Monitoring Kafka Messages
-
-Access Kafka UI at `http://localhost:8090` to:
-- View topics
-- Monitor messages in `customer-events` topic
-- Check consumer groups
-- Inspect message payloads
-
-## 🔍 Logging
-
-The application uses structured logging similar to MuleSoft's visual flow trace:
-
-```
-🌊 [MuleSoft Flow START] Processing customer ID: 1
-📍 [MuleSoft Flow - Step 1] Calling external API...
-🔌 [MuleSoft Connector] Fetching customer data for ID: 1
-✅ [MuleSoft Connector] Successfully fetched customer: Emily Johnson
-📍 [MuleSoft Flow - Step 2] Transforming customer data...
-🔄 [MuleSoft Transformer] Applying DataWeave transformation...
-🔄 [MuleSoft Transformer] Transformation complete: Emily Johnson → loyalty score: Silver
-📍 [MuleSoft Flow - Step 3] Publishing to Kafka topic...
-📤 [MuleSoft VM Publish] Publishing event for customer ID: 1
-✅ [MuleSoft VM Publish] Successfully published event
-✅ [MuleSoft Logger] Successfully processed customer: Emily Johnson
-🌊 [MuleSoft Flow END] Completed processing for customer ID: 1
-```
-
-## 🔧 Configuration
-
-Edit `src/main/resources/application.yml`:
-
-```yaml
-spring:
-  kafka:
-    bootstrap-servers: localhost:9092
-external:
-  api:
-    base-url: https://dummyjson.com/users/
-server:
-  port: 8080
-```
-
-## 🎯 Key Features Demonstrated
-
-### 1. **Async External API Calls**
-- WebClient for non-blocking REST calls
-- Timeout configuration
-- Error handling
-
-### 2. **Data Transformation**
-- Field mapping and renaming
-- Computed fields (loyalty score)
-- Null safety
-
-### 3. **Kafka Integration**
-- Asynchronous message publishing
-- Partitioning by customer ID
-- JSON serialization
-
-### 4. **Error Handling**
-- Retry logic with exponential backoff
-- Circuit breaker pattern ready
-- Comprehensive error responses
-
-### 5. **Observability**
-- Structured logging
-- Health checks
-- Actuator endpoints
-
-## 📈 Performance Considerations
-
-- **Reactive Programming**: WebFlux for non-blocking I/O
-- **Connection Pooling**: WebClient reuses connections
-- **Async Messaging**: Kafka for decoupled communication
-- **Retry Mechanism**: Resilient to transient failures
-
-## 🚀 Next Steps for Production
-
-1. **Add Circuit Breaker**: Use Resilience4j
-2. **Add Metrics**: Integrate Micrometer/Prometheus
-3. **Add Tracing**: OpenTelemetry or Zipkin
-4. **Add Security**: OAuth2/JWT authentication
-5. **Add Caching**: Redis for frequently accessed data
-6. **Add API Gateway**: Spring Cloud Gateway
-7. **Add Service Discovery**: Eureka or Consul
-
-## 📚 Additional Resources
-
-- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
-- [Spring Kafka](https://spring.io/projects/spring-kafka)
-- [Spring WebFlux](https://docs.spring.io/spring-framework/reference/web/webflux.html)
-- [MuleSoft Migration Guide](https://docs.mulesoft.com/)
-
-## 📝 License
-
-This is a prototype for demonstration purposes.
+---
+## 🔍 Error & Retry Strategy
+- Transient external call failures retried (`@Retryable`).
+- Central exception mapping to HTTP responses (`GlobalExceptionHandler`).
+- MuleSoft correspondence commented in controller & service for traceability.
 
 ---
+## 📤 Messaging (Kafka)
+- Topic: `customer-events` (configurable once broker available)
+- Non-blocking: application operates even if broker unreachable (logs warnings).
 
-**Built with ❤️ using Spring Boot 3.3.5**
+---
+## 🧪 Dashboard Behavior
+Mode | Trigger | Behavior
+-----|---------|---------
+Live | Backend reachable | Real HTTP calls & real data
+Demo | Backend down | Mock data + simulated logs
+
+---
+## 📈 Performance & Future Enhancements
+Planned upgrades:
+1. Resilience4j Circuit Breakers
+2. Micrometer + Prometheus / Grafana
+3. OpenTelemetry tracing
+4. OAuth2/JWT security layer
+5. Async streaming (WebSocket/SSE) for live logs
+6. Redis caching for frequent customers
+7. GitHub Actions CI/CD pipeline
+
+---
+## 💼 Leadership Talking Points
+- Cost Efficiency: Replace per-user or per-transaction licensing with commodity cloud + open-source.
+- Talent Alignment: Leverages existing internal Java/Spring expertise.
+- Incremental Migration: Coexistence possible—wrap Mule endpoints, gradually redirect traffic.
+- Observability: Visual dashboard accelerates onboarding & decision-making.
+- Extensibility: Kafka enables event-driven expansion (analytics, notifications).
+
+---
+## 🔒 Security Considerations (Roadmap)
+| Area | Planned Control |
+|------|-----------------|
+| AuthN/AuthZ | Spring Security + OAuth2 Provider |
+| Secrets | Externalize via Vault / Azure Key Vault |
+| Dependency Risk | OWASP / SCA scanning in CI |
+| Transport | Enforce HTTPS + TLS termination |
+
+---
+## 🤝 Contributing (Internal Prototype)
+1. Fork or branch `main`
+2. Create feature branch: `git checkout -b feature/kafka-consumer`
+3. Commit with conventional messages: `feat: add consumer for loyalty enrichment`
+4. PR requires: tests green + README section updates if new features.
+
+---
+## 📜 License
+Prototype – add proper LICENSE (e.g., MIT/Apache-2.0) before external publication.
+
+---
+## 🗺️ Presentation Flow (Demo Script)
+1. Show architecture & mapping table.
+2. Run `/api/customer/5` – display dashboard updates.
+3. Highlight emoji logs (flow semantics).
+4. Show Actuator health & retry behavior (temporarily disable network).
+5. Optional: enable Kafka and show published events.
+6. Conclude with future enhancements slide.
+
+---
+## 🧩 Known Tasks Before External Sharing
+- [ ] Remove embedded `.git` under `integration-visualizer/`
+- [ ] Add LICENSE
+- [ ] Add CI workflow
+- [ ] Add security placeholders (`application.yml` profile separation)
+- [ ] Add README badges (build, version, license)
+
+---
+## ❓ Troubleshooting
+Issue | Resolution
+------|-----------
+Port 8080 busy | Terminate stale Java process; retry run
+Port 3000 busy | `netstat -ano | findstr :3000` then `taskkill /PID <PID> /F`
+Cannot read dashboard folder | Remove nested `.git` or adjust permissions
+Kafka warnings | Safe to ignore for demo; start broker when ready
+
+---
+## 📑 Appendix: MuleSoft Equivalency Comment Pattern
+Example in controller:
+```java
+// Equivalent to MuleSoft Flow
+// MuleSoft HTTP Listener → @RestController
+// MuleSoft Connector → WebClient
+// MuleSoft Transformer → Java transformation logic
+// MuleSoft Logger → Slf4j logging
+```
+Ensure new code additions maintain this header where applicable.
+
+---
+**Built with ❤️ using Spring Boot 3.3.x, Java 17, Next.js, and open-source tooling**
