@@ -132,15 +132,16 @@ CustomerEventProducer.java   → Kafka publishing
 ## 📚 Documentation Quick Links
 
 ```
-START HERE → INDEX.md            (Documentation guide)
-           → PROJECT_SUMMARY.md  (Complete overview)
-           → QUICKSTART.md       (Detailed quick start)
+START HERE → README.md                           (Main documentation)
+           → QUICKSTART.md                       (Fast setup guide)
+           → COPILOT_INTEGRATION_SUMMARY.md      (GitHub Copilot overview)
 
-LEARN      → MIGRATION_GUIDE.md  (MuleSoft → Spring Boot)
-           → DIAGRAMS.md         (Visual architecture)
+LEARN      → docs/MIGRATION_GUIDE.md             (MuleSoft → Spring Boot)
+           → docs/GITHUB_COPILOT_APPROACH.md     (AI-accelerated migration)
+           → DIAGRAMS.md                         (Visual architecture)
 
-BUILD      → BUILD.md            (Installation help)
-           → README.md           (Technical docs)
+DEVELOP    → docs/COPILOT_PROMPTS_LIBRARY.md     (30+ ready-to-use prompts)
+           → CONTRIBUTING.md                     (Development workflow)
 ```
 
 ---
@@ -242,8 +243,8 @@ Retry              →  @Retryable
    - Shows expected output
 
 4. **Read the docs**
-   - INDEX.md is your friend
-   - MIGRATION_GUIDE explains concepts
+   - README.md is your starting point
+   - docs/MIGRATION_GUIDE.md explains concepts
 
 ---
 
@@ -267,8 +268,8 @@ Retry              →  @Retryable
 ## 📞 Need Help?
 
 1. **Quick help**: QUICKSTART.md → Troubleshooting
-2. **Build help**: BUILD.md → Common Issues
-3. **Understanding**: MIGRATION_GUIDE.md
+2. **Build help**: CONTRIBUTING.md → Development Setup
+3. **Understanding**: docs/MIGRATION_GUIDE.md
 4. **Visual aid**: DIAGRAMS.md
 
 ---
