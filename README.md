@@ -14,6 +14,7 @@
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
+- [GitHub Copilot Acceleration](#-github-copilot-acceleration)
 - [Live Demo](#-live-demo)
 - [Architecture](#-architecture)
 - [Technology Stack](#-technology-stack)
@@ -53,6 +54,62 @@ This project demonstrates a **real-world migration** from MuleSoft integration f
 **Problem:** MuleSoft vendor lock-in, per-user/transaction licensing, limited talent pool  
 **Solution:** Open-source Spring Boot with equivalent capabilities + better ecosystem  
 **Result:** 60-70% cost reduction + improved developer productivity + modern architecture
+
+---
+
+## GitHub Copilot Acceleration
+
+### AI-Powered Migration with Tools You Already Own
+
+This project demonstrates how **GitHub Copilot accelerates MuleSoft to Spring Boot migration by 60-80%**. If your organization already uses GitHub Copilot, you can leverage it for faster, more consistent code generation at zero additional cost.
+
+**Migration Velocity Comparison:**
+
+| Task | Manual Time | With Copilot | Time Saved |
+|------|------------|--------------|------------|
+| REST Controller | 2-3 hours | 20-30 min | 75-85% |
+| DataWeave to Java | 4-6 hours | 1-1.5 hours | 70-80% |
+| HTTP Client | 1-2 hours | 15-20 min | 80-85% |
+| Unit Tests | 3-4 hours | 30-45 min | 75-85% |
+| Documentation | 2-3 hours | 20-30 min | 85-90% |
+
+**Enhanced ROI with Copilot:**
+- **Traditional Migration:** $1.3M over 12 months
+- **With Copilot:** $554K over 5 months (57% reduction)
+- **Additional Savings:** $746K in labor costs
+- **Total Annual Benefit:** $270K-$540K (licensing) + $746K (labor) = **$1.0M-$1.3M**
+
+### How It Works
+
+```
+MuleSoft XML/DataWeave  →  GitHub Copilot  →  Spring Boot Code + Tests + Docs
+```
+
+**Key Capabilities:**
+- Generate Spring Boot controllers from MuleSoft HTTP listeners
+- Convert DataWeave transformations to Java mappers
+- Create WebClient implementations from HTTP connectors
+- Auto-generate comprehensive unit tests
+- Produce API documentation automatically
+
+**Documentation:**
+- [Complete GitHub Copilot Approach Guide](docs/GITHUB_COPILOT_APPROACH.md)
+- [Copilot Prompt Library](docs/COPILOT_PROMPTS_LIBRARY.md) - 30+ ready-to-use prompts
+- [`.github/copilot-instructions.md`](.github/copilot-instructions.md) - Project-specific AI configuration
+
+**Example: Converting MuleSoft Flow**
+
+Input prompt to Copilot:
+```java
+// Convert MuleSoft processCustomerFlow to Spring Boot
+// 1. REST endpoint: GET /api/customer/{id}
+// 2. Call external API to fetch user data
+// 3. Transform response with business rules
+// 4. Publish to Kafka topic
+// MuleSoft equivalent: processCustomerFlow
+```
+
+Copilot generates complete implementation with controllers, services, mappers, error handling, and logging.
 
 ---
 
@@ -521,6 +578,8 @@ mvn verify
 
 | Document | Description | Location |
 |----------|-------------|----------|
+| **GITHUB_COPILOT_APPROACH.md** | Complete Copilot migration strategy and patterns | `docs/` |
+| **COPILOT_PROMPTS_LIBRARY.md** | 30+ ready-to-use Copilot prompts | `docs/` |
 | **MIGRATION_ANALYSIS.md** | Cost-benefit analysis, portfolio assessment, AI prompts | `docs/` |
 | **LEADERSHIP_PRESENTATION.md** | Executive summary, ROI, timeline, risk matrix | `docs/` |
 | **MIGRATION_GUIDE.md** | Step-by-step technical migration patterns | `docs/` |
@@ -528,9 +587,10 @@ mvn verify
 
 ### Key Topics Covered
 
-- 📊 Cost savings analysis ($270K-$540K annually)
+- **GitHub Copilot Integration** - AI-accelerated development workflows
+- **Copilot Prompt Engineering** - Reusable templates for common migration tasks
+- 📊 Cost savings analysis ($270K-$540K annually + $746K labor savings with Copilot)
 - 🏢 Application portfolio mapping (FDN, CIMA, APE, PORTAL)
-- 🤖 AI-assisted migration prompts
 - 📈 ROI calculations and payback period
 - ⚠️ Risk assessment and mitigation
 - 🔄 Phased migration approach

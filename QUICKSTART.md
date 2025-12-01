@@ -183,7 +183,7 @@ If external API times out:
 
 ## 📚 Next Steps
 
-1. ✅ **Read the Migration Guide** - `MIGRATION_GUIDE.md`
+1. ✅ **Read the Migration Guide** - `docs/MIGRATION_GUIDE.md`
 2. ✅ **Explore the Code** - Start with `IntegrationController.java`
 3. ✅ **Review Tests** - Check `IntegrationServiceTest.java`
 4. ✅ **Customize** - Modify transformation logic in `IntegrationService.java`
@@ -228,7 +228,7 @@ If external API times out:
 ## 📞 Support
 
 For issues or questions:
-1. Check `MIGRATION_GUIDE.md` for detailed explanations
+1. Check `docs/MIGRATION_GUIDE.md` for detailed explanations
 2. Review `README.md` for architecture overview
 3. Examine test files for usage examples
 4. Check application logs for error details
